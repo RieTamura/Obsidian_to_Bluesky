@@ -188,11 +188,8 @@ class PostModal extends Modal {
         if (this.selectedImages.length > 0) {
             try {
                 const uploadedImages: Image[] = await Promise.all( this.selectedImages.map(async (file) => {
-                    // 画像を読み込み、縦横サイズを取得
                     const imageBitmap = await createImageBitmap(file);
                     const { width, height } = imageBitmap;
-
-                    // Canvas APIを使い画像を再描画してメタデータを削除（推奨）
                     const canvas = document.createElement('canvas');
                     canvas.width = width;
                     canvas.height = height;
@@ -202,15 +199,11 @@ class PostModal extends Modal {
                     const processedBlob = await new Promise<Blob>((resolve, reject) => {
                         canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Canvas to Blob conversion failed')), file.type);
                     });
-
-                    // Blueskyにアップロード
                     const buffer = await processedBlob.arrayBuffer();
                     const uploaded = await this.plugin.uploadBlob(buffer, processedBlob.type);
-                    
-                    // aspectRatioを含めたデータを返す
                     return {
                         image: uploaded.blob,
-                        alt: '', // ここに代替テキストを入れることも可能
+                        alt: '',
                         aspectRatio: { width, height }
                     };
                 }));
@@ -260,7 +253,9 @@ class PostModal extends Modal {
 class BlueskySettingTab extends PluginSettingTab {
 	plugin: BlueskyPlugin; constructor(app: App, plugin: BlueskyPlugin) { super(app, plugin); this.plugin = plugin; }
 	display(): void {
-		const { containerEl } = this; containerEl.empty(); containerEl.createEl('h2', { text: 'Obsidian to Bluesky Settings' });
+		const { containerEl } = this; containerEl.empty();
+        // ★★★ ここを変更 ★★★
+        containerEl.createEl('h2', { text: 'Obsidian to Bluesky Settings' });
 		new Setting(containerEl).setName('Bluesky Handle').setDesc('あなたのBlueskyハンドル（例: username.bsky.social）').addText(text => text.setPlaceholder('username.bsky.social').setValue(this.plugin.settings.handle).onChange(async (value) => { this.plugin.settings.handle = value; await this.plugin.saveSettings(); }));
 		new Setting(containerEl).setName('App Password').setDesc('BlueskyのApp Password（設定から作成してください）').addText(text => text.setPlaceholder('xxxx-xxxx-xxxx-xxxx').setValue(this.plugin.settings.password).onChange(async (value) => { this.plugin.settings.password = value; await this.plugin.saveSettings(); }));
 		new Setting(containerEl).setName('Default Hashtags').setDesc('投稿に自動で追加するハッシュタグ（改行して追加されます）').addText(text => text.setPlaceholder('#obsidian #note').setValue(this.plugin.settings.defaultHashtags).onChange(async (value) => { this.plugin.settings.defaultHashtags = value; await this.plugin.saveSettings(); }));
