@@ -1,0 +1,92 @@
+## Obsidian to Bluesky Plugin
+
+![alt text](https://img.shields.io/github/v/release/RieTamura/Obsidian_to_Bluesky?style=for-the-badge&sort=semver)
+
+
+![alt text](https://img.shields.io/github/actions/workflow/status/RieTamura/Obsidian_to_Bluesky/release.yml?style=for-the-badge)
+
+Obsidianから直接Bluesky（ブルースカイ）へノートやテキストを投稿するための非公式プラグインです。
+
+このプラグインを使えば、Obsidianでの思考の整理やメモ書きの流れを止めることなく、シームレスにSNSへ発信することができます。
+### ✨ 主な機能
+
+- ノート全体を投稿: 現在開いているノートの内容をそのままBlueskyに投稿します。
+- 選択範囲を投稿: エディタで選択したテキストだけを抜き出して投稿します。
+- 新規投稿の作成: Obsidian内で投稿用モーダルを開き、新しい投稿を作成します。
+- 画像添付: 最大4枚までの画像を投稿に添付できます。
+- リンクプレビュー: 投稿に含まれるURLのリンクプレビューを自動で生成します。
+- デフォルトハッシュタグ: 設定で指定したハッシュタグを投稿時に自動で追加します。
+- 文字数（バイト数）カウンター: Blueskyの制限（300バイト）を超えないように文字数をリアルタイムで表示します。
+- リボンアイコン: サイドバーのアイコンからワンクリックで投稿画面を開けます。
+
+### ⚙️ インストール方法
+Community Pluginsから (推奨)
+
+※現在、コミュニティプラグインへの登録申請中です。承認され次第、こちらが最も簡単なインストール方法になります。
+
+    Obsidianの 設定 > コミュニティプラグイン を開きます。
+
+    コミュニティプラグインを閲覧 をクリックし、「Bluesky」を検索します。
+
+    インストール ボタンをクリックします。
+
+    インストールが完了したら、有効化 ボタンをクリックします。
+
+手動インストール
+
+    このリポジトリのReleasesページにアクセスします。
+
+    最新リリースのAssetsから main.js, styles.css, manifest.json の3つのファイルをダウンロードします。
+
+    お使いのObsidian Vault（保管庫）の .obsidian/plugins/ ディレクトリ内に、obsidian-bluesky-plugin のような新しいフォルダを作成します。
+
+    ダウンロードした3つのファイルを、作成したフォルダの中に移動します。
+
+    Obsidianを再読み込み（リロード）するか、一度閉じてから再度開きます。
+
+    設定 > コミュニティプラグイン を開き、"Bluesky Plugin" を有効化します。
+
+### 🚀 使い方
+1. 初期設定
+
+プラグインを有効化したら、まず初めにBlueskyアカウントとの連携設定が必要です。
+
+    Obsidianの 設定 > Bluesky Plugin タブを開きます。
+
+    Bluesky Handle: あなたのBlueskyハンドル名（例: yourname.bsky.social）を入力します。
+
+    App Password: Blueskyの アプリパスワード を入力します。
+
+        重要: セキュリティのため、あなたのメインのパスワードは絶対に使用しないでください。アプリパスワードは、Blueskyの 設定 > 高度な設定 > アプリパスワード から新たに生成できます。
+
+    (オプション) Default Hashtags: 投稿時に自動で追加したいハッシュタグがあれば入力します（例: #Obsidian）。
+
+2. 投稿する
+
+以下の方法で投稿用モーダルを開くことができます。
+
+    コマンドパレットから:
+
+        Ctrl+P (macOSでは Cmd+P) でコマンドパレットを開きます。
+
+        Bluesky と入力し、実行したいコマンドを選択します。
+
+            Post current note to Bluesky: ノート全体を投稿
+
+            Post selection to Bluesky: 選択範囲を投稿
+
+            Create new Bluesky post: 新規投稿
+
+    リボンアイコンから:
+
+        Obsidianの左側にあるリボンメニューから、送信アイコン（紙飛行機）をクリックします。
+
+開いたモーダルウィンドウにテキストを入力・編集し、必要であれば画像を追加して、「投稿」ボタンをクリックしてください。
+
+### 🤝 貢献
+
+バグ報告や機能改善の提案は、このリポジトリのIssuesまでお気軽にお寄せください。プルリクエストも歓迎します！
+
+### 📄 ライセンス
+
+このプラグインは MITライセンス の下で公開されています。
