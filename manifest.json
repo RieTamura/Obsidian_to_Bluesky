@@ -1,0 +1,11 @@
+{
+	"id": "obsidian-bluesky-plugin",
+	"name": "Bluesky Plugin",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "ObsidianからBlueskyに投稿するプラグイン",
+	"author": "Your Name",
+	"authorUrl": "https://your-website.com",
+	"fundingUrl": "https://buymeacoffee.com/yourname",
+	"isDesktopOnly": false
+}
