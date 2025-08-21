@@ -85,7 +85,7 @@ Community Pluginsから (推奨)
 
 ### 🤝 貢献
 
-バグ報告や機能改善の提案は、このリポジトリのIssuesまでお気軽にお寄せください。プルリクエストも歓迎します！
+バグ報告や機能改善の提案は、このリポジトリの[Issues](https://github.com/RieTamura/Obsidian_to_Bluesky/issues)までお気軽にお寄せください。プルリクエストも歓迎します！
 
 ### 📄 ライセンス
 
