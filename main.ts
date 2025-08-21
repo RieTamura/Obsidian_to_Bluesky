@@ -12,40 +12,40 @@ type Embed = ExternalEmbed | ImageEmbed;
 
 
 export default class BlueskyPlugin extends Plugin {
-	settings: BlueskyPluginSettings;
-	accessJwt: string = '';
-	refreshJwt: string = '';
+    settings: BlueskyPluginSettings;
+    accessJwt: string = '';
+    refreshJwt: string = '';
     userAvatar: string = '';
 
-	async onload() {
-		await this.loadSettings();
-		this.addCommand({ id: 'post-selection-to-bluesky', name: 'Post selection to Bluesky', editorCallback: (editor: Editor, view: MarkdownView) => { const selection = editor.getSelection(); if (selection?.trim()) new PostModal(this.app, this, selection).open(); else new Notice('テキストを選択してください'); } });
-		this.addCommand({ id: 'post-note-to-bluesky', name: 'Post current note to Bluesky', editorCallback: (editor: Editor, view: MarkdownView) => { const content = editor.getValue(); if (content?.trim()) new PostModal(this.app, this, content).open(); else new Notice('ノートが空です'); } });
-		this.addCommand({ id: 'create-new-post', name: 'Create new Bluesky post', callback: () => new PostModal(this.app, this, '').open() });
-		this.addRibbonIcon('send', 'Post to Bluesky', () => new PostModal(this.app, this, '').open());
-		this.addSettingTab(new BlueskySettingTab(this.app, this));
-	}
+    async onload() {
+        await this.loadSettings();
+        this.addCommand({ id: 'post-selection-to-bluesky', name: 'Post selection to Bluesky', editorCallback: (editor: Editor, view: MarkdownView) => { const selection = editor.getSelection(); if (selection?.trim()) new PostModal(this.app, this, selection).open(); else new Notice('テキストを選択してください'); } });
+        this.addCommand({ id: 'post-note-to-bluesky', name: 'Post current note to Bluesky', editorCallback: (editor: Editor, view: MarkdownView) => { const content = editor.getValue(); if (content?.trim()) new PostModal(this.app, this, content).open(); else new Notice('ノートが空です'); } });
+        this.addCommand({ id: 'create-new-post', name: 'Create new Bluesky post', callback: () => new PostModal(this.app, this, '').open() });
+        this.addRibbonIcon('send', 'Post to Bluesky', () => new PostModal(this.app, this, '').open());
+        this.addSettingTab(new BlueskySettingTab(this.app, this));
+    }
 
-	onunload() {}
-	async loadSettings() { this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData()); }
-	async saveSettings() { await this.saveData(this.settings); }
+    onunload() { }
+    async loadSettings() { this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData()); }
+    async saveSettings() { await this.saveData(this.settings); }
 
-	async login(): Promise<boolean> {
-		if (!this.settings.handle || !this.settings.password) { new Notice('Blueskyのハンドルとパスワードを設定してください'); return false; }
-		try {
-			const resp = await fetch('https://bsky.social/xrpc/com.atproto.server.createSession', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifier: this.settings.handle, password: this.settings.password }), });
-			if (!resp.ok) throw new Error(`ログインに失敗しました: ${resp.status}`);
-			const data = await resp.json();
-			this.accessJwt = data.accessJwt; this.refreshJwt = data.refreshJwt;
-			try {
-				const profileResp = await fetch(`https://bsky.social/xrpc/app.bsky.actor.getProfile?actor=${data.did}`, { headers: { 'Authorization': `Bearer ${this.accessJwt}` } });
-				if (profileResp.ok) { const profileData = await profileResp.json(); this.userAvatar = profileData.avatar || ''; }
-			} catch (e) { console.error("アバターの取得に失敗しました:", e); }
-			return true;
-		} catch (error) { new Notice(`ログインエラー: ${error.message}`); return false; }
-	}
+    async login(): Promise<boolean> {
+        if (!this.settings.handle || !this.settings.password) { new Notice('Blueskyのハンドルとパスワードを設定してください'); return false; }
+        try {
+            const resp = await fetch('https://bsky.social/xrpc/com.atproto.server.createSession', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifier: this.settings.handle, password: this.settings.password }), });
+            if (!resp.ok) throw new Error(`ログインに失敗しました: ${resp.status}`);
+            const data = await resp.json();
+            this.accessJwt = data.accessJwt; this.refreshJwt = data.refreshJwt;
+            try {
+                const profileResp = await fetch(`https://bsky.social/xrpc/app.bsky.actor.getProfile?actor=${data.did}`, { headers: { 'Authorization': `Bearer ${this.accessJwt}` } });
+                if (profileResp.ok) { const profileData = await profileResp.json(); this.userAvatar = profileData.avatar || ''; }
+            } catch (e) { console.error("アバターの取得に失敗しました:", e); }
+            return true;
+        } catch (error) { new Notice(`ログインエラー: ${error.message}`); return false; }
+    }
 
-	detectFacets(text: string) {
+    detectFacets(text: string) {
         const facets = [];
         const encoder = new TextEncoder();
         const linkRegex = /https?:\/\/[^\s]+/g;
@@ -68,14 +68,14 @@ export default class BlueskyPlugin extends Plugin {
         return facets.length > 0 ? facets : undefined;
     }
 
-	async uploadBlob(blob: ArrayBuffer, mimeType: string): Promise<any> {
+    async uploadBlob(blob: ArrayBuffer, mimeType: string): Promise<any> {
         if (!this.accessJwt) { if (!(await this.login())) throw new Error("ログインに失敗しました"); }
         const response = await fetch('https://bsky.social/xrpc/com.atproto.repo.uploadBlob', { method: 'POST', headers: { 'Content-Type': mimeType, 'Authorization': `Bearer ${this.accessJwt}` }, body: blob });
         if (!response.ok) { if (response.status === 401 && (await this.login())) return this.uploadBlob(blob, mimeType); throw new Error(`画像アップロードに失敗しました: ${response.status}`); }
         return await response.json();
     }
 
-	async postToBluesky(text: string, embed?: Embed): Promise<boolean> {
+    async postToBluesky(text: string, embed?: Embed): Promise<boolean> {
         if (!text.trim() && (!embed || embed.$type !== 'app.bsky.embed.images')) { new Notice('投稿内容が空です'); return false; }
         if (new TextEncoder().encode(text).length > 300) { new Notice(`投稿が300バイトを超えています。テキストを短くしてください。`); return false; }
         if (!this.accessJwt) { if (!(await this.login())) return false; }
@@ -93,12 +93,12 @@ export default class BlueskyPlugin extends Plugin {
 }
 
 class PostModal extends Modal {
-	plugin: BlueskyPlugin; initialText: string; textArea: HTMLTextAreaElement; charCountEl: HTMLElement; postButton: ButtonComponent; linkPreviewContainer: HTMLElement; imagePreviewContainer: HTMLElement; linkPreviewData: LinkPreviewData | null = null; selectedImages: File[] = []; fileInput: HTMLInputElement; private debounceTimer: NodeJS.Timeout | null = null;
-	constructor(app: App, plugin: BlueskyPlugin, initialText: string) { super(app); this.plugin = plugin; this.initialText = initialText; }
+    plugin: BlueskyPlugin; initialText: string; textArea: HTMLTextAreaElement; charCountEl: HTMLElement; postButton: ButtonComponent; linkPreviewContainer: HTMLElement; imagePreviewContainer: HTMLElement; linkPreviewData: LinkPreviewData | null = null; selectedImages: File[] = []; fileInput: HTMLInputElement; private debounceTimer: number | null = null;
+    constructor(app: App, plugin: BlueskyPlugin, initialText: string) { super(app); this.plugin = plugin; this.initialText = initialText; }
 
-	onOpen() {
-		const { contentEl } = this;
-		contentEl.empty();
+    onOpen() {
+        const { contentEl } = this;
+        contentEl.empty();
         contentEl.addClass('bluesky-modal-container');
 
         const headerEl = contentEl.createDiv({ cls: 'bluesky-modal-header' });
@@ -106,30 +106,30 @@ class PostModal extends Modal {
         this.postButton = new ButtonComponent(headerEl).setButtonText('投稿').setCta().onClick(() => this.handlePost());
 
         const mainEl = contentEl.createDiv({ cls: 'bluesky-modal-main' });
-        if (this.plugin.userAvatar) { mainEl.createEl('img', { cls: 'bluesky-avatar', attr: { src: this.plugin.userAvatar }}); }
-        this.textArea = mainEl.createEl('textarea', { cls: 'bluesky-textarea', attr: { placeholder: "最近どう？" }});
-        
-		let displayText = this.initialText;
-		if (this.plugin.settings.defaultHashtags?.trim()) { displayText += (displayText ? '\n\n' : '') + this.plugin.settings.defaultHashtags.trim(); }
-		this.textArea.value = displayText;
+        if (this.plugin.userAvatar) { mainEl.createEl('img', { cls: 'bluesky-avatar', attr: { src: this.plugin.userAvatar } }); }
+        this.textArea = mainEl.createEl('textarea', { cls: 'bluesky-textarea', attr: { placeholder: "最近どう？" } });
 
-		this.linkPreviewContainer = contentEl.createDiv({ cls: 'bluesky-preview-container' });
+        let displayText = this.initialText;
+        if (this.plugin.settings.defaultHashtags?.trim()) { displayText += (displayText ? '\n\n' : '') + this.plugin.settings.defaultHashtags.trim(); }
+        this.textArea.value = displayText;
+
+        this.linkPreviewContainer = contentEl.createDiv({ cls: 'bluesky-preview-container' });
         this.imagePreviewContainer = contentEl.createDiv({ cls: 'bluesky-image-preview-container' });
-		
+
         const footerEl = contentEl.createDiv({ cls: 'bluesky-modal-footer' });
         const actionsEl = footerEl.createDiv({ cls: 'bluesky-actions' });
-        this.fileInput = contentEl.createEl('input', { type: 'file', attr: { multiple: true, accept: 'image/*', style: 'display: none;' }});
+        this.fileInput = contentEl.createEl('input', { type: 'file', attr: { multiple: true, accept: 'image/*', style: 'display: none;' } });
         this.fileInput.onchange = (e) => this.handleFileSelect(e);
         new ButtonComponent(actionsEl).setIcon('image-file').setTooltip('画像を追加 (最大4枚)').onClick(() => this.fileInput.click());
         this.charCountEl = footerEl.createDiv({ cls: 'bluesky-char-count' });
-		
-		this.textArea.addEventListener('input', () => { this.updateCharCount(); this.debounceUpdatePreviews(); });
-		this.updateCharCount(); this.updateLinkPreview();
-		setTimeout(() => { this.textArea.focus(); this.textArea.setSelectionRange(this.initialText.length, this.initialText.length); }, 100);
-		this.addStyles();
-	}
 
-	handleFileSelect(event: Event) {
+        this.textArea.addEventListener('input', () => { this.updateCharCount(); this.debounceUpdatePreviews(); });
+        this.updateCharCount(); this.updateLinkPreview();
+        setTimeout(() => { this.textArea.focus(); this.textArea.setSelectionRange(this.initialText.length, this.initialText.length); }, 100);
+        this.addStyles();
+    }
+
+    handleFileSelect(event: Event) {
         const files = (event.target as HTMLInputElement).files; if (!files) return;
         if (this.selectedImages.length + files.length > 4) { new Notice('画像は最大4枚までです。'); return; }
         if (files.length > 0) { this.linkPreviewData = null; this.linkPreviewContainer.empty(); }
@@ -147,7 +147,7 @@ class PostModal extends Modal {
         });
     }
 
-	updateCharCount() {
+    updateCharCount() {
         const byteLength = new TextEncoder().encode(this.textArea.value).length;
         this.charCountEl.textContent = `${byteLength}/300`;
         const isOverLimit = byteLength > 300;
@@ -155,9 +155,9 @@ class PostModal extends Modal {
         this.postButton.setDisabled(isOverLimit);
     }
 
-	debounceUpdatePreviews() { if (this.debounceTimer) clearTimeout(this.debounceTimer); this.debounceTimer = setTimeout(() => this.updateLinkPreview(), 500); }
+    debounceUpdatePreviews() { if (this.debounceTimer) clearTimeout(this.debounceTimer); this.debounceTimer = setTimeout(() => this.updateLinkPreview(), 500); }
 
-	async updateLinkPreview() {
+    async updateLinkPreview() {
         if (this.selectedImages.length > 0) return;
         const match = this.textArea.value.match(/https?:\/\/[^\s]+/); const url = match ? match[0] : null;
         if (url && url === this.linkPreviewData?.url) return;
@@ -165,14 +165,14 @@ class PostModal extends Modal {
         if (url) { this.linkPreviewData = await this.fetchLinkPreview(url); if (this.linkPreviewData) this.displayLinkPreview(this.linkPreviewData); }
     }
 
-	async fetchLinkPreview(url: string): Promise<LinkPreviewData | null> {
+    async fetchLinkPreview(url: string): Promise<LinkPreviewData | null> {
         try {
             const response = await requestUrl({ url }); const doc = new DOMParser().parseFromString(response.text, 'text/html'); const getMeta = (prop: string) => doc.querySelector(`meta[property="${prop}"]`)?.getAttribute('content');
             return { url, title: getMeta('og:title') || doc.querySelector('title')?.textContent || url, description: getMeta('og:description') || getMeta('description') || '', image: getMeta('og:image'), domain: new URL(url).hostname };
         } catch (error) { console.error('Failed to fetch link preview:', error); return { url, title: url, domain: new URL(url).hostname }; }
     }
 
-	displayLinkPreview(preview: LinkPreviewData) {
+    displayLinkPreview(preview: LinkPreviewData) {
         this.linkPreviewContainer.empty(); const cardEl = this.linkPreviewContainer.createDiv({ cls: 'bluesky-link-card' });
         if (preview.image) cardEl.createEl('img', { cls: 'bluesky-link-image' }).src = preview.image;
         const contentEl = cardEl.createDiv({ cls: 'bluesky-link-content' });
@@ -182,12 +182,12 @@ class PostModal extends Modal {
         cardEl.addEventListener('click', () => window.open(preview.url, '_blank'));
     }
 
-	async handlePost() {
+    async handlePost() {
         const text = this.textArea.value.trim(); if (!text && this.selectedImages.length === 0) { new Notice('投稿内容を入力してください'); return; }
         this.postButton.setButtonText('Posting...').setDisabled(true); let embed: Embed | undefined;
         if (this.selectedImages.length > 0) {
             try {
-                const uploadedImages: Image[] = await Promise.all( this.selectedImages.map(async (file) => {
+                const uploadedImages: Image[] = await Promise.all(this.selectedImages.map(async (file) => {
                     const imageBitmap = await createImageBitmap(file);
                     const { width, height } = imageBitmap;
                     const canvas = document.createElement('canvas');
@@ -208,8 +208,10 @@ class PostModal extends Modal {
                     };
                 }));
                 embed = { $type: 'app.bsky.embed.images', images: uploadedImages };
-            } catch (error) { new Notice(`画像アップロードエラー: ${error.message}`);  
-            this.postButton.setButtonText('Post').setDisabled(false); return; }
+            } catch (error) {
+                new Notice(`画像アップロードエラー: ${error.message}`);
+                this.postButton.setButtonText('Post').setDisabled(false); return;
+            }
         } else if (this.linkPreviewData?.title) {
             let thumb; if (this.linkPreviewData.image) { try { const imgResponse = await requestUrl({ url: this.linkPreviewData.image }); const blob = imgResponse.arrayBuffer; const mimeType = imgResponse.headers['content-type'] || 'image/jpeg'; const uploadedImage = await this.plugin.uploadBlob(blob, mimeType); thumb = { $type: 'blob', ref: uploadedImage.blob.ref, mimeType: uploadedImage.blob.mimeType, size: uploadedImage.blob.size }; } catch (error) { console.error('Image upload failed:', error); } }
             embed = { $type: 'app.bsky.embed.external', external: { uri: this.linkPreviewData.url, title: this.linkPreviewData.title, description: this.linkPreviewData.description || '', thumb: thumb } };
@@ -217,12 +219,12 @@ class PostModal extends Modal {
         if (await this.plugin.postToBluesky(text, embed)) this.close(); else this.postButton.setButtonText('Post').setDisabled(false);
     }
 
-	addStyles() {
-		const styleId = 'bluesky-plugin-styles';
-		if (document.getElementById(styleId)) return;
-		const styleEl = document.createElement('style');
-		styleEl.id = styleId;
-		styleEl.textContent = `
+    addStyles() {
+        const styleId = 'bluesky-plugin-styles';
+        if (document.getElementById(styleId)) return;
+        const styleEl = document.createElement('style');
+        styleEl.id = styleId;
+        styleEl.textContent = `
             .bluesky-modal-container { display: flex; flex-direction: column; height: 100%; }
             .bluesky-modal-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; margin-top: 10px; }
             .bluesky-modal-main { display: flex; flex-grow: 1; }
@@ -244,21 +246,21 @@ class PostModal extends Modal {
 			.bluesky-char-count { font-size: 12px; color: var(--text-muted); }
 			.bluesky-char-count.bluesky-over-limit { color: var(--text-error); font-weight: bold; }
 		`;
-		document.head.appendChild(styleEl);
-	}
+        document.head.appendChild(styleEl);
+    }
 
-	onClose() { if (this.debounceTimer) clearTimeout(this.debounceTimer); this.contentEl.empty(); }
+    onClose() { if (this.debounceTimer) clearTimeout(this.debounceTimer); this.contentEl.empty(); }
 }
 
 class BlueskySettingTab extends PluginSettingTab {
-	plugin: BlueskyPlugin; constructor(app: App, plugin: BlueskyPlugin) { super(app, plugin); this.plugin = plugin; }
-	display(): void {
-		const { containerEl } = this; containerEl.empty();
+    plugin: BlueskyPlugin; constructor(app: App, plugin: BlueskyPlugin) { super(app, plugin); this.plugin = plugin; }
+    display(): void {
+        const { containerEl } = this; containerEl.empty();
         // ★★★ ここを変更 ★★★
         containerEl.createEl('h2', { text: 'Obsidian to Bluesky Settings' });
-		new Setting(containerEl).setName('Bluesky Handle').setDesc('あなたのBlueskyハンドル（例: username.bsky.social）').addText(text => text.setPlaceholder('username.bsky.social').setValue(this.plugin.settings.handle).onChange(async (value) => { this.plugin.settings.handle = value; await this.plugin.saveSettings(); }));
-		new Setting(containerEl).setName('App Password').setDesc('BlueskyのApp Password（設定から作成してください）').addText(text => text.setPlaceholder('xxxx-xxxx-xxxx-xxxx').setValue(this.plugin.settings.password).onChange(async (value) => { this.plugin.settings.password = value; await this.plugin.saveSettings(); }));
-		new Setting(containerEl).setName('Default Hashtags').setDesc('投稿に自動で追加するハッシュタグ（改行して追加されます）').addText(text => text.setPlaceholder('#obsidian #note').setValue(this.plugin.settings.defaultHashtags).onChange(async (value) => { this.plugin.settings.defaultHashtags = value; await this.plugin.saveSettings(); }));
-		containerEl.createEl('p', { text: '注意: App Passwordを使用してください。メインパスワードは使用しないでください。', cls: 'setting-item-description' });
-	}
+        new Setting(containerEl).setName('Bluesky Handle').setDesc('あなたのBlueskyハンドル（例: username.bsky.social）').addText(text => text.setPlaceholder('username.bsky.social').setValue(this.plugin.settings.handle).onChange(async (value) => { this.plugin.settings.handle = value; await this.plugin.saveSettings(); }));
+        new Setting(containerEl).setName('App Password').setDesc('BlueskyのApp Password（設定から作成してください）').addText(text => text.setPlaceholder('xxxx-xxxx-xxxx-xxxx').setValue(this.plugin.settings.password).onChange(async (value) => { this.plugin.settings.password = value; await this.plugin.saveSettings(); }));
+        new Setting(containerEl).setName('Default Hashtags').setDesc('投稿に自動で追加するハッシュタグ（改行して追加されます）').addText(text => text.setPlaceholder('#obsidian #note').setValue(this.plugin.settings.defaultHashtags).onChange(async (value) => { this.plugin.settings.defaultHashtags = value; await this.plugin.saveSettings(); }));
+        containerEl.createEl('p', { text: '注意: App Passwordを使用してください。メインパスワードは使用しないでください。', cls: 'setting-item-description' });
+    }
 }
