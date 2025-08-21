@@ -20,7 +20,7 @@ Obsidianから直接Bluesky（ブルースカイ）へノートやテキスト�
 
 **手動インストール方法**
 
-1. このリポジトリの[Releasesページ](https://github.com/RieTamura/Obsidian_to_Bluesky/releases/tag/v0.1.0)にアクセスし、最新リリースのAssetsから main.js, styles.css, manifest.json の3つのファイルをダウンロードします。
+1. このリポジトリのReleasesページにアクセスし、最新リリースのAssetsから main.js, styles.css, manifest.json の3つのファイルをダウンロードします。
 2. お使いのObsidian Vault（保管庫）の .obsidian/plugins/ ディレクトリ内に、obsidian-bluesky-plugin のような新しいフォルダを作成します。
 3. ダウンロードした3つのファイルを、作成したフォルダの中に移動します。
 4. Obsidianを再読み込み（リロード）するか、一度閉じてから再度開きます。
