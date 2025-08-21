@@ -89,4 +89,4 @@ Community Pluginsから (推奨)
 
 ### 📄 ライセンス
 
-このプラグインは MITライセンス の下で公開されています。
+このプラグインは [MITライセンス](https://github.com/RieTamura/Obsidian_to_Bluesky/blob/main/LICENSE) の下で公開されています。
