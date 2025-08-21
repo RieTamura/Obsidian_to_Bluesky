@@ -1,10 +1,5 @@
 ## Obsidian to Bluesky Plugin
 
-![alt text](https://img.shields.io/github/v/release/RieTamura/Obsidian_to_Bluesky?style=for-the-badge&sort=semver)
-
-
-![alt text](https://img.shields.io/github/actions/workflow/status/RieTamura/Obsidian_to_Bluesky/release.yml?style=for-the-badge)
-
 Obsidianから直接Bluesky（ブルースカイ）へノートやテキストを投稿するための非公式プラグインです。
 
 このプラグインを使えば、Obsidianでの思考の整理やメモ書きの流れを止めることなく、シームレスにSNSへ発信することができます。
@@ -20,19 +15,8 @@ Obsidianから直接Bluesky（ブルースカイ）へノートやテキスト�
 - リボンアイコン: サイドバーのアイコンからワンクリックで投稿画面を開けます。
 
 ### ⚙️ インストール方法
-Community Pluginsから (推奨)
 
-※現在、コミュニティプラグインへの登録申請中です。承認され次第、こちらが最も簡単なインストール方法になります。
-
-    Obsidianの 設定 > コミュニティプラグイン を開きます。
-
-    コミュニティプラグインを閲覧 をクリックし、「Bluesky」を検索します。
-
-    インストール ボタンをクリックします。
-
-    インストールが完了したら、有効化 ボタンをクリックします。
-
-手動インストール
+**手動インストール**
 
     このリポジトリのReleasesページにアクセスします。
 
