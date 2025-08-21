@@ -260,7 +260,7 @@ class PostModal extends Modal {
 class BlueskySettingTab extends PluginSettingTab {
 	plugin: BlueskyPlugin; constructor(app: App, plugin: BlueskyPlugin) { super(app, plugin); this.plugin = plugin; }
 	display(): void {
-		const { containerEl } = this; containerEl.empty(); containerEl.createEl('h2', { text: 'Bluesky Plugin Settings' });
+		const { containerEl } = this; containerEl.empty(); containerEl.createEl('h2', { text: 'Obsidian to Bluesky Settings' });
 		new Setting(containerEl).setName('Bluesky Handle').setDesc('あなたのBlueskyハンドル（例: username.bsky.social）').addText(text => text.setPlaceholder('username.bsky.social').setValue(this.plugin.settings.handle).onChange(async (value) => { this.plugin.settings.handle = value; await this.plugin.saveSettings(); }));
 		new Setting(containerEl).setName('App Password').setDesc('BlueskyのApp Password（設定から作成してください）').addText(text => text.setPlaceholder('xxxx-xxxx-xxxx-xxxx').setValue(this.plugin.settings.password).onChange(async (value) => { this.plugin.settings.password = value; await this.plugin.saveSettings(); }));
 		new Setting(containerEl).setName('Default Hashtags').setDesc('投稿に自動で追加するハッシュタグ（改行して追加されます）').addText(text => text.setPlaceholder('#obsidian #note').setValue(this.plugin.settings.defaultHashtags).onChange(async (value) => { this.plugin.settings.defaultHashtags = value; await this.plugin.saveSettings(); }));

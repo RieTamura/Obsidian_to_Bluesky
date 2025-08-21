@@ -1,11 +1,10 @@
 {
-	"id": "obsidian-bluesky-plugin",
-	"name": "Bluesky Plugin",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "ObsidianからBlueskyに投稿するプラグイン",
-	"author": "Your Name",
-	"authorUrl": "https://your-website.com",
-	"fundingUrl": "https://buymeacoffee.com/yourname",
-	"isDesktopOnly": false
+  "id": "obsidian-to-bluesky",
+  "name": "Obsidian to Bluesky",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Obsidianのノートや選択範囲をBlueskyに投稿します。",
+  "author": "RieTamura",
+	"authorUrl": "https://github.com/RieTamura/Obsidian_to_Bluesky",
+  "isDesktopOnly": false
 }
